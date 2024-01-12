@@ -1,4 +1,4 @@
-//Stars  Program of dynamic art like a screen savergit
+//Stars  Program of dynamic art like a screen saver
 /*MIT License
 Copyright (c) 2023 Darwin Geiselbrecht
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@ use rand::Rng;
 
 const X_MAX: u32= 2200;              // size of window in x direction
 const Y_MAX: u32 = 1300;             // size of window in y direction
-const NUM_STARS:usize = 100;         // number of each type of stars
+const NUM_STARS:usize = 200;         // number of each type of stars
 const MIN_SPEED:f32 = 0.1;           // minimum speed of movement
 const MAX_SPEED:f32 = 2.;            // maximum speed of movement
 const MIN_SIZE:u32 = 30;             // minimum size of star
@@ -69,7 +69,7 @@ struct Star {
 
 impl Star {
 
-
+    // move the star and check for collisions
     fn move_star(&mut self) {
         let half_size: u32 = self.size/2;
         self.x += self.speed * self.direction.cos() ;
@@ -93,10 +93,9 @@ impl Star {
             self.y = half_size as f32;
         }
     }
-    fn update(&mut self,canvas:&mut Canvas<Window>){
-      //  let x_pos:i32 = self.x as i32;
-      //  let y_pos:i32 = self.y as i32;
 
+    // re-draw the star, requires outer and inner draw
+    fn update(&mut self,canvas:&mut Canvas<Window>){
 
       draw( canvas,self.x,self.y,self.size,self.num_points,
         self.notch_depth,self.outer_angle,self.outer_color);
@@ -205,8 +204,9 @@ impl Star {
             _ => {}
         }         
     }               
-    
-    fn randomize(&mut self) {                               //randomize starting position and direction
+
+    //randomize starting position and direction   
+    fn randomize(&mut self) {                               
         let mut rng = rand::thread_rng();
         self.x = rng.gen_range(0.0, X_MAX as f32);
         self.y = rng.gen_range(0.0 ,Y_MAX as f32);
@@ -231,13 +231,10 @@ impl Star {
             _=> {}
         }
     }
-    /*fn carom(&mut self) {                                   // bounce off at a random direction
-        let mut rng = rand::thread_rng();
-        self.direction = fix_angle(self.direction +(rng.gen_range(PI/2.,TWOPI)) * TWOPI);
-        self.move_star();
-    }*/
-} 
-// draw a star - tgus us called twice to make the imbedded stars   
+
+} // end of the star implementation
+
+// draw a star - this is called twice to make the imbedded stars   
 fn draw(canvas:&mut Canvas<Window>,x:f32,y:f32,size:u32,num_points:u32,notch_depth:f32,angle:f32,
         color:Color){
     let radius: f32 = size as f32/2.;
@@ -279,12 +276,6 @@ fn check_collisions(stars:&mut Vec<Star>) {
         for k in 0 .. stars.len() {
             if j != k {
 
-                /*   let delta_x = (stars[j].x - stars[k].x).abs();
-                let delta_y = (stars[j].y - stars[k].y).abs();
-                if (delta_x < stars[j].size as f32) && (delta_y < stars[k].size as f32) {
-                    stars[j].carom();                    // collided carom off randomlly
-                    stars[k].carom();
-                }*/
                 let distance = find_distance_between_stars(stars[j],stars[k]) as f32;
                 let min_distance = (stars[j].size/2 + stars[k].size/2 ) as f32;
                 if distance <= min_distance { 
@@ -329,7 +320,6 @@ fn find_direction_between_stars (  star_1:Star, star_2: Star) -> f32 {
 }
 
 // bounce - cause a star to bounce off another, returns the desired direction of star_1
-
 fn bounce (star_1:Star,star_2:Star) -> f32 {
     let direction = find_direction_between_stars(star_1,star_2) - PI;
     fix_angle(direction)
@@ -372,7 +362,7 @@ fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump()?;
     
 
-    let mut stars = Vec::with_capacity(NUM_STARS);
+    let mut stars = Vec::with_capacity(NUM_STARS);          // set up the star vector and push in some stars
 
     for _i in 0 ..NUM_STARS {
        stars.push(Star {size:100,num_points:5,notch_depth: 40.,x:(X_MAX/2) as f32,y:(Y_MAX/2) as f32,
@@ -419,4 +409,5 @@ fn main() -> Result<(), String> {
     } //running loop
 
     Ok(())
+    
 }
